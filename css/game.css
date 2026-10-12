@@ -64,7 +64,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* 立绘 */
-#portrait { position: absolute; z-index: 30; bottom: -6px; height: min(64%, 440px); pointer-events: none; transition: opacity .2s, transform .2s; }
+#portrait { position: absolute; z-index: 30; bottom: 0; height: 96%; pointer-events: none; transition: opacity .2s, transform .2s; }
 #portrait.left { left: 3%; } #portrait.right { right: 3%; }
 #portrait.dim { opacity: .5; transform: translateY(8px); }
 #portrait svg { height: 100%; width: auto; display: block; }
@@ -235,7 +235,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
   #dialog.tape .text { font-size: 21px; }
   .tile { width: 64px; } .tile .pic { width: 52px; height: 52px; } .tile .pic svg { width: 46px; height: 46px; }
   .tray-label { display: none; }
-  #portrait { height: min(56%, 300px); }
+  #portrait { height: 92%; }
   .page { padding: 16px 14px 20px; }
   .entries li { font-size: 20px; }
   .qpage .head { font-size: 26px; }

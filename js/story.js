@@ -240,26 +240,29 @@
     }
   };
   const deck = {
+    async use(id) {
+      if (id === 'cassette' || id === 'pencil') { await deck.hs.well(); return true; }
+      return false;
+    },
     hs: {
       lamp: () => is('power') ? talk([['n', '电源灯亮着。']]) : talk([['n', '电源灯是暗的。没通电。'], ['n', '电线从机器后面垂下去，一直垂到桌子底下。']]),
       async well() {
         const g = G();
         if (!is('tapeIn')) {
-          await g.present('把什么放进带仓？', 'cassette', { notebook: '手札塞不进去。', button: '纽扣会掉进机器里。', ticket: '车票不是放在这儿的。', pencil: '先得有磁带。' });
           flag('tapeIn');
-          return talk([['n', '磁带卡进带仓，咔的一声。']]);
+          return talk([['n', '我把盒子里那盘 R-17 放进带仓。咔的一声。']]);
         }
         if (is('taut')) return talk([['n', '带子绷得很直。']]);
         if (!is('sawSlack')) { flag('sawSlack'); return talk([['n', '带子从底下垂出来一截。在盒子里放了几年，松了。'], ['n', '这样放下去会绞带。']]); }
         if (!is('hasPencil')) return talk([['n', '带子垂着一截。得找个细长的东西，把它卷紧。']]);
-        if (!is('wind1')) { flag('wind1'); return talk([['n', '我把铅笔插进带轴，慢慢地转。']]); }
-        if (!is('wind2')) { flag('wind2'); return talk([['n', '垂下来的带子收回去一截。再转几圈。']]); }
+        flag('wind1'); await talk([['n', '我把铅笔插进带轴，慢慢地转。']]);
+        flag('wind2'); await talk([['n', '垂下来的带子一点点收回去。']]);
         flag('taut'); g.sfx('unlock');
         return talk([['n', '带子绷直了。']]);
       },
       async play() {
         const g = G();
-        if (!is('tapeIn')) return talk([['n', '带仓是空的。']]);
+        if (!is('tapeIn')) { flag('tapeIn'); await talk([['n', '带仓是空的。我把 R-17 放了进去。']]); }
         if (!is('power')) return talk([['n', '播放键按下去，没有反应。'], ['n', '电源灯是暗的。']]);
         if (!is('taut')) {
           const firstTime = !is('sawSlack'); flag('sawSlack');
@@ -505,15 +508,16 @@
     }
   };
   const heroCostume = {
+    async use(id) { if (id === 'button' && !is('seamMatched')) { await heroCostume.hs.seam(true); return true; } return false; },
     hs: {
       collar: () => talk([['n', '领口缝着名字：胡黎。和海报上的主演是同一个。'], ['fox', '是我。大家叫我狐狸。']]),
       oldBtn: () => talk([['n', '右肩的纽扣。黑底金星，边上磨得发乌。']]),
       newBtn: () => talk([['n', '左肩这颗亮一些。金色还没磨掉。'], ['n', '是后来补上去的。']]),
-      async seam() {
+      async seam(direct) {
         const g = G();
         if (is('seamMatched')) return talk([['n', '裂口和衣缝里的碎片，严丝合缝。']]);
         await talk([['n', '左肩的衣缝里，卡着一小片黑色的东西。']]);
-        await g.present('拿什么和它比一比？', 'button', { notebook: '手札上没有缺口。', cassette: '不是磁带上的。', ticket: '车票是纸的。', label: '这是收音机的标签。' });
+        if (direct !== true) await g.present('拿什么和它比一比？', 'button', { notebook: '手札上没有缺口。', cassette: '不是磁带上的。', ticket: '车票是纸的。', label: '这是收音机的标签。' });
         flag('seamMatched');
         await talk([
           ['n', '我把裂掉的纽扣靠上去。'],
@@ -676,13 +680,14 @@
     }
   };
   const fridge = {
+    async use(id) { if (id === 'ticket' && !is('ticketWhy')) { await fridge.hs.slip(true); return true; } return false; },
     hs: {
       note: () => talk([['n', '一张便签：汤在锅里，自己盛。落款是一个“周”字。']]),
-      async slip() {
+      async slip(direct) {
         const g = G();
         if (is('ticketWhy')) return talk([['n', '器材归还单。6.14，归还人林拾。']]);
         await talk([['n', '冰箱上压着一张发黄的器材归还单。'], ['n', '追光灯两台，音箱一只，折叠椅十二把。归还人：林拾。'], ['n', '归还日期，6.14。']]);
-        await g.present('6.14。这个日期，我在哪见过？', 'ticket', { notebook: '手札里的记录到 6.03 就翻页了。', cassette: '磁带上是 5.29。', button: '纽扣上没有日期。', label: '标签上最后一次是 5.29。' });
+        if (direct !== true) await g.present('6.14。这个日期，我在哪见过？', 'ticket', { notebook: '手札里的记录到 6.03 就翻页了。', cassette: '磁带上是 5.29。', button: '纽扣上没有日期。', label: '标签上最后一次是 5.29。' });
         await talk([['n', '车票上印着 6.14。同一天。'], ['zhou', '那次演出完，全社去了海边。'], ['zhou', '总得有人留下来还器材。'], ['n', '票他买了。没去。']]);
         flag('ticketWhy');
         g.closeCloseup();

@@ -259,6 +259,9 @@
         if (picking) return picking(id);
         if (busy) return;
         setBusy(true); sfx('click');
+        const ctxDef = closeId ? story().closeups[closeId] : scene();
+        const used = ctxDef && ctxDef.use ? await ctxDef.use(id) : false;
+        if (used) { await settle(); return; }
         if (id === 'notebook') await book.browse(); else await card(id, false);
         await settle();
       };
@@ -426,8 +429,9 @@
 
   /* ---------- 输入 ---------- */
   let dragged = false, downX = 0;
-  sceneEl.addEventListener('pointerdown', (e) => { downX = e.clientX; dragged = false; });
-  sceneEl.addEventListener('pointermove', (e) => { if (Math.abs(e.clientX - downX) > 10) dragged = true; });
+  // 只有按住拖动房间才算“拖动”，单纯移动鼠标不算；在任何地方按下都会重置
+  view.addEventListener('pointerdown', (e) => { downX = e.clientX; dragged = false; }, true);
+  sceneEl.addEventListener('pointermove', (e) => { if (e.buttons && Math.abs(e.clientX - downX) > 10) dragged = true; });
   const tap = () => { if (advance) advance(); };
   dlg.addEventListener('click', tap);
   view.addEventListener('click', (e) => { if (e.target.closest('.sheet,.phone,.xbtn,.transition,.book-tabs,.mine')) return; tap(); });

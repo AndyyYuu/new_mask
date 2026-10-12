@@ -13,6 +13,9 @@ out = f'''<title>第十一号失主</title>
 <div id="app"></div>
 <script>window.AUDIO_BASE = 'audio/';</script>
 <script>
+{read('js/figures.js')}
+</script>
+<script>
 {read('js/art.js')}
 </script>
 <script>
