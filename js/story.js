@@ -13,7 +13,7 @@
     notebook: { name: '手札', icon: 'it-notebook', desc: '前半本写满了别人的事。最后四页只有题头，一个字没填。没有名字。' },
     cassette: { name: '磁带 R-17', short: '磁带', icon: 'it-cassette', desc: () => is('heard') ? '十七秒。他修好收音机的那个下午。标签：R-17，5.29。' : '手写标签：R-17，5.29。看纸的颜色，有几年了。' },
     button: { name: '裂掉的纽扣', short: '纽扣', icon: 'it-button', desc: () => is('matched') ? '黑色，四角星。和《借星的人》戏服肩上的是同一种。从线孔裂到了边上。' : '黑色，压着一枚四角星。从线孔裂到了边上，缝不回去了。' },
-    ticket: { name: '没用过的车票', short: '车票', icon: 'it-ticket', desc: () => is('ticketWhy') ? '海滨专线，6.14。全社去海边那天，他留下来还器材。' : '海滨专线，6.14。没有检票的孔。' },
+    ticket: { name: '没用过的车票', short: '车票', icon: 'it-ticket', desc: () => is('ticketWhy') ? '票他买了。只是那天，总得有人留下。海滨专线，6.14。' : '海滨专线，6.14。没有检票的孔。' },
     pencil: { name: '铅笔', icon: 'it-pencil', desc: '灯光间笔筒里的。粗细正好能卡进带轴。' },
     label: { name: '维修标签（照片）', short: '维修标签', icon: 'it-label', desc: '三次修理：3.02、4.17、5.29。试听留在 R-17。维修人只剩一个“林”字。' }
   };
@@ -554,6 +554,7 @@
           ['fox', '我喊过他。……没再喊第二遍。'],
           ['fox', '合照拍了七次。他一次都没站进来。每次都说马上好。']]);
         flag('handSeen'); flag('buttonWhy');
+        await g.note('第七张合照', '七次合照，他每次都在场。只是不在画面里。');
         await talk([
           ['n', '我看着照片里那只手，又看了看手里裂掉的纽扣。'],
           ['n', '那天所有人都有一张照片，证明自己在场。'],
@@ -571,6 +572,7 @@
     if (is('bowlsDone') || ![1, 2, 3, 4, 5].every((n) => is('b' + n))) return;
     flag('bowlsDone');
     await talk([['n', '五只碗，五个名字。我又数了一遍。'], ['n', '没有他自己的。'], ['zhou', '他都是等大家吃完，站在灶边就着锅吃。']]);
+    await G().note('写了名字的碗', '每只碗都有名字，除了洗碗的人。');
   };
   const finale = async () => {
     const g = G();
@@ -592,19 +594,39 @@
     g.book.hide();
     await talk([
       ['n', '门外有人喊：“小林！楼下还有两箱，再帮个忙！”'],
-      ['n', '他已经半站起来了。'],
-      ['n', '停住。'],
+      ['n', '他已经半站起来了。三年里，他大概每次都是这样站起来的。']]);
+    await deduce('我得做点什么。', [
+      { id: 'help', t: '“我替你去搬。”' },
+      { id: 'quiet', t: '什么也不说，等他自己决定' },
+      { id: 'bowl', t: '把那只写着他名字的碗，推到他面前', ok: true }],
+      { help: '我站起来，又坐下了。我去了，这碗汤还是会凉在这里。他缺的不是一个替他搬箱子的人。', quiet: '他会去的。他每次都会去。三年里，没有人拦过他一次。' });
+    await talk([
+      ['n', '我把碗推过去。碗底朝上的那一面，写着他的名字。'],
+      ['you', '汤快凉了。'],
+      ['n', '他看着碗，停住了。'],
       ['lin', '不了。我今晚有事。'],
       ['n', '门外安静了一下。“……哦，行！”'],
-      ['n', '第三页，当场有了答案。']]);
+      ['n', '第三页，当场有了答案。'],
+      ['n', '他坐下来，端起了那只碗。']]);
     flag('saidNo');
     await talk([
-      ['n', '老周把那只碗推到他面前，盛满。'],
-      ['n', '他看了一会儿碗底的名字，端起来了。'],
       ['fox', '（推门）我没来晚吧。'],
-      ['fox', '定时器我设了十五秒。这次你站中间。'],
+      ['fox', '合照欠你的。定时器我设了十五秒。'],
+      ['n', '大家挤到灶台前面。'],
+      ['n', '小林已经走到三脚架旁边，弯腰去看取景框。和那七次一样。']]);
+    await deduce('他又站到镜头后面去了。', [
+      { id: 'shoot', t: '“那你帮我们按一下。”' },
+      { id: 'later', t: '等拍完，再单独给他拍一张' },
+      { id: 'call', t: '“你站中间。”', ok: true }],
+      { shoot: '那他就又不在照片里了。第八次。', later: '狐狸也说过“等演出完再给他拍”。后来就没有后来了。' });
+    await talk([
+      ['you', '你站中间。'],
+      ['n', '他愣了一下。'],
+      ['fox', '听见没，站中间。'],
+      ['n', '他走了过来。定时器的红灯开始闪。'],
       ['n', '快门响的时候，他没有说马上。'],
       ['lin', '那你那四页呢？']]);
+    flag('photoTaken');
     const heads = [1, 2, 3, 4].map((n) => ({ id: String(n), t: `给他看第${'一二三四'[n - 1]}页：${g.S.answers[n] ? g.S.answers[n].slice(0, 14) + (g.S.answers[n].length > 14 ? '…' : '') : '（留白）'}`, ghost: true }));
     const a = await g.choose('挑一页给他看，或者都留给自己。', heads.concat([{ id: 'keep', t: '先都留给自己' }]));
     if (a === 'keep') await talk([['lin', '行。本来就是写给自己的。']]);
@@ -620,7 +642,7 @@
     g.book.show('fly');
     await talk([['n', '小林把手札翻回扉页，在那句话下面添了一行。'], ['n', '这本手札，终于有了名字。']]);
     g.book.hide();
-    g.ending();
+    return g.go('epilogue', '三天后', '旧礼堂门口');
   };
   const kitchen = {
     art: 'kitchen', place: '第四间 · 后厨', focus: 0.5,
@@ -690,15 +712,69 @@
         if (direct !== true) await g.present('6.14。这个日期，我在哪见过？', 'ticket', { notebook: '手札里的记录到 6.03 就翻页了。', cassette: '磁带上是 5.29。', button: '纽扣上没有日期。', label: '标签上最后一次是 5.29。' });
         await talk([['n', '车票上印着 6.14。同一天。'], ['zhou', '那次演出完，全社去了海边。'], ['zhou', '总得有人留下来还器材。'], ['n', '票他买了。没去。']]);
         flag('ticketWhy');
+        await g.note('没用过的车票', '票他买了。只是那天，总得有人留下。');
         g.closeCloseup();
       }
     }
   };
 
+
+  /* ---------- 三天后：现在时 ---------- */
+  const epilogue = {
+    art: 'epilogue', place: '三天后 · 旧礼堂门口', focus: 0.62,
+    goal: () => !is('edgeSeen') ? '拍合照之前，看一眼取景框。' : '',
+    hint: () => [['n', '三脚架上架着手机。看看取景框里都有谁。'], ['n', '也看看取景框外面。']],
+    async enter(first) {
+      if (!first) return;
+      await talk([
+        ['n', '三天后，礼堂清空了。'],
+        ['n', '负责人在群里说，志愿者最后拍张合照。'],
+        ['n', '小林也来了。这次没人叫他帮忙，他是来拍照的。'],
+        ['fox', '定时器还是十五秒。都站好。']]);
+    },
+    hs: {
+      group: () => talk([['n', '大家挤在台阶上。狐狸把小林按在了正中间。'], ['n', '老周站在后排，室友在找角度。']]),
+      lead: () => talk([['n', '负责人站在门边，一袋一袋地扎垃圾袋。'], ['lead', '你们先拍，我把这几袋弄完。'], ['n', '他从第一天就在。']]),
+      bags: () => talk([['n', '六袋。都是这三天清出来的。'], ['n', '十一号柜那个铁盒，差一点也在里面。']]),
+      async tripod() { G().openCloseup('viewfinder'); }
+    },
+    async check() {
+      const g = G();
+      if (!is('edgeSeen')) return;
+      await deduce('快门还有十秒。', [
+        { id: 'after', t: '等拍完了再叫他' },
+        { id: 'skip', t: '算了，他本来就不爱拍照' },
+        { id: 'call', t: '走过去，接过他手里的垃圾袋：“一起拍。”', ok: true }],
+        { after: '拍完了，就没有“再”了。狐狸说过的。', skip: '他是不爱拍，还是从来没人叫过他？' });
+      flag('leadIn');
+      await talk([
+        ['n', '我走过去，接过他手里的袋子。'],
+        ['you', '一起拍。'],
+        ['lead', '……我？'],
+        ['n', '他看了看手上的灰，在裤子上擦了两下。'],
+        ['lead', '行。'],
+        ['fox', '快快快，还有三秒！'],
+        ['n', '咔嚓。'],
+        ['n', '照片里，负责人站在最边上，笑得有点僵。'],
+        ['n', '但这一次，画面外面没有人了。']]);
+      g.ending();
+    }
+  };
+  const viewfinder = {
+    hs: {
+      inframe: () => talk([['n', '取景框里，大家都在。小林在正中间。']]),
+      async edge() {
+        if (is('edgeSeen')) return talk([['n', '取景框右边，那半只胳膊还在扎袋子。']]);
+        await talk([['n', '取景框最右边，露出半只胳膊，手里拎着垃圾袋。'], ['n', '第七张合照里，也有这样一只手。']]);
+        flag('edgeSeen');
+        G().closeCloseup();
+      }
+    }
+  };
   window.Story = {
     items, book, known,
-    scenes: { chat, lockers, box, booth, props, backstage, kitchen },
-    closeups: { deck, radio, poster, rack, costume: heroCostume, photos, cupboard, fridge },
-    endCard: () => ({ eyebrow: '失 物 已 归 还', title: '第十一号失主', text: '铁盒还回去了。四页问题，他的和我的，都有了去处。' })
+    scenes: { chat, lockers, box, booth, props, backstage, kitchen, epilogue },
+    closeups: { deck, radio, poster, rack, costume: heroCostume, photos, cupboard, fridge, viewfinder },
+    endCard: () => ({ eyebrow: '失 物 已 归 还', title: '第十一号失主', text: '铁盒还回去了。合照里，这一次没有人站在画面外面。看见那个总在画面边上的人，叫他一声。' })
   };
 })();

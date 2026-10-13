@@ -347,6 +347,14 @@
     }
   };
 
+  /* 关键物的一句话：被忽略的人留下的东西 */
+  function note(title, line) {
+    advance = null; dlg.className = 'idle'; whoEl.hidden = true; nextEl.hidden = true; choicesEl.innerHTML = ''; textEl.textContent = '';
+    sheetEl.innerHTML = `<div class="caption"><span class="eyebrow">${esc(title)}</span><p>${esc(line)}</p><button class="choice">继续</button></div>`;
+    sheetEl.hidden = false; sfx('found');
+    return new Promise((res) => { const b = $('.choice', sheetEl); b.onclick = () => { sfx('click'); closeSheet(); res(); }; if (!('ontouchstart' in window)) b.focus({ preventScroll: true }); });
+  }
+
   /* 给人看一样东西（比如别人的手机），点带 data-close 的按钮关上 */
   function sheet(html) {
     advance = null; dlg.className = 'idle'; whoEl.hidden = true; nextEl.hidden = true; choicesEl.innerHTML = ''; textEl.textContent = '';
@@ -434,7 +442,7 @@
   sceneEl.addEventListener('pointermove', (e) => { if (e.buttons && Math.abs(e.clientX - downX) > 10) dragged = true; });
   const tap = () => { if (advance) advance(); };
   dlg.addEventListener('click', tap);
-  view.addEventListener('click', (e) => { if (e.target.closest('.sheet,.phone,.xbtn,.transition,.book-tabs,.mine')) return; tap(); });
+  view.addEventListener('click', (e) => { if (e.target.closest('.sheet,.phone,.xbtn,.transition,.book-tabs,.mine,.caption')) return; tap(); });
   document.addEventListener('keydown', (e) => {
     if (e.target.matches('textarea,input')) return;
     if ((e.key === 'Enter' || e.key === ' ') && advance && !e.target.closest('button,.hs')) { e.preventDefault(); tap(); }
@@ -444,7 +452,7 @@
   /* ---------- 给剧情用的接口 ---------- */
   window.G = {
     get S() { return S; }, say, talk, choose, present, circle, give, drop, has, is, flag, go, wait, sfx, tape,
-    openCloseup, closeCloseup, book, ending, sheet, view, sceneEl, closeEl, el, esc
+    openCloseup, closeCloseup, book, ending, sheet, note, view, sceneEl, closeEl, el, esc
   };
   title();
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) window.claude.hot.snapshot(() => { store.save(); return {}; });

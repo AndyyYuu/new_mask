@@ -723,10 +723,47 @@
     return svg(1000, 720, s + frame(1000, 720), 'close-svg');
   }
 
+
+  /* ---------- 场景六：三天后，礼堂门口 ---------- */
+  const fig = (n, x, y, h) => (window.Figures ? window.Figures[n](`x="${x}" y="${y}" width="${h * 0.4}" height="${h}"`) : '');
+  function epilogue() {
+    let s = wall(1600, 900, 800);
+    s += `<g filter="url(#sh)"><rect x="470" y="110" width="660" height="690" rx="8" fill="${C.woodD}"/></g>
+      <rect x="500" y="150" width="290" height="650" fill="${C.wood}"/><rect x="810" y="150" width="290" height="650" fill="${C.wood}"/>
+      <g fill="none" stroke="${C.woodD}" stroke-width="5" opacity=".5"><rect x="530" y="190" width="230" height="250" rx="6"/><rect x="530" y="480" width="230" height="280" rx="6"/><rect x="840" y="190" width="230" height="250" rx="6"/><rect x="840" y="480" width="230" height="280" rx="6"/></g>
+      <circle cx="770" cy="480" r="12" fill="${C.brass}"/><circle cx="830" cy="480" r="12" fill="${C.brass}"/>` + plate(680, 52, 240, 56, '旧 礼 堂', 28);
+    s += `<rect x="380" y="770" width="840" height="30" fill="#5a4b3c"/><rect x="420" y="740" width="760" height="30" fill="#6a594a"/>`;
+    const group = fig('zhou', 700, 300, 450) + fig('mate', 560, 330, 430) + fig('lin', 800, 330, 440) + fig('fox', 920, 330, 430);
+    s += H('group', '台阶上的大家', group, [560, 320, 560, 450], { mx: 1110, my: 336 });
+    const bags = `<g filter="url(#sh)">${[0, 1, 2].map((i) => `<path d="M${1290 + i * 70} 800c-20-56 4-120 44-136 14-6 10-26 24-28s14 20 30 26c44 18 60 84 44 138z" fill="${C.ink}"/>`).join('')}</g>`;
+    s += H('bags', '一排垃圾袋', bags, [1270, 640, 300, 160], { mx: 1556, my: 650 });
+    s += H('lead', '门边的负责人', fig('lead', 1170, 360, 420), [1180, 370, 160, 400], { key: true, mx: 1330, my: 384 });
+    const tripod = `<g filter="url(#sh)"><path d="M250 520l-80 280M250 520l80 280M250 520v280" stroke="${C.ink}" stroke-width="10" stroke-linecap="round"/>
+      <rect x="214" y="420" width="72" height="110" rx="10" fill="${C.ink}"/><rect x="221" y="430" width="58" height="88" rx="4" fill="${C.tealL}"/><circle cx="250" cy="406" r="7" fill="${C.red}"/></g>`;
+    s += H('tripod', '三脚架上的手机', tripod, [160, 392, 180, 410], { key: true, mx: 332, my: 404 });
+    return svg(1600, 900, s + frame(1600, 900));
+  }
+  function viewfinderClose() {
+    let s = `<rect width="1000" height="720" fill="url(#wallg)"/><rect width="1000" height="720" fill="url(#dots)"/>
+      <defs><clipPath id="vf-clip"><rect x="130" y="110" width="740" height="480" rx="10"/></clipPath></defs>
+      <g filter="url(#sh)"><rect x="90" y="70" width="820" height="560" rx="40" fill="${C.ink}"/></g>
+      <g clip-path="url(#vf-clip)"><rect x="130" y="110" width="740" height="480" fill="${C.wood}"/><rect x="130" y="110" width="740" height="480" fill="url(#dots)"/>
+        <rect x="130" y="520" width="740" height="70" fill="#5a4b3c"/>
+        ${fig('zhou', 380, 150, 420)}${fig('mate', 250, 180, 400)}${fig('lin', 470, 180, 410)}${fig('fox', 580, 180, 400)}
+        ${fig('lead', 772, 210, 380)}</g>
+      <g stroke="#fff" stroke-width="1.6" opacity=".5"><path d="M377 110v480M623 110v480M130 270h740M130 430h740"/></g>
+      <g fill="none" stroke="#fff" stroke-width="4" opacity=".85"><path d="M150 150v-20h20M850 150v-20h-20M150 550v20h20M850 550v20h-20"/></g>
+      <text x="160" y="160" class="t-mono" font-size="20" fill="#fff" opacity=".9">⏱ 15s</text>
+      <circle cx="500" cy="612" r="10" fill="${C.cream}" opacity=".6"/>`;
+    s += H('inframe', '取景框里的大家', '', [250, 160, 520, 420], { mx: 760, my: 176 });
+    s += H('edge', '取景框最右边', '', [800, 200, 70, 380], { mx: 846, my: 214 });
+    return svg(1000, 720, s + frame(1000, 720), 'close-svg');
+  }
+
   window.Art = {
     C, sprite,
-    scenes: { blank, lockers, box, booth, props, backstage, kitchen },
-    closeups: { deck: deckClose, radio: radioClose, poster: posterClose, rack: rackClose, costume: costumeClose, photos: photosClose, cupboard: cupboardClose, fridge: fridgeClose },
+    scenes: { blank, lockers, box, booth, props, backstage, kitchen, epilogue },
+    closeups: { deck: deckClose, radio: radioClose, poster: posterClose, rack: rackClose, costume: costumeClose, photos: photosClose, cupboard: cupboardClose, fridge: fridgeClose, viewfinder: viewfinderClose },
     portraits: window.Figures || { lead, mate, fox, zhou, lin },
     icon: (id, cls) => `<svg viewBox="0 0 120 120" class="${cls || 'icon'}" aria-hidden="true"><use href="#${id}"/></svg>`
   };
