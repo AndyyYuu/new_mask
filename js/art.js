@@ -636,25 +636,83 @@
   }
 
   /* ---------- 特写：合照墙 ---------- */
+  /* ---------- 特写：合照墙（七张照片逐张画） ---------- */
+  // 照片里的小人：x 中心，base 脚底，o: c 衣色 hair 发色 hs 发型(short/pony/long/bun) h 身高 laugh 笑 up 举手(l/r/both) bow 鞠躬角度 face 朝向
+  const tiny = (x, base, o = {}) => {
+    const h = o.h || 74, c = o.c || C.grey, hr = o.hair || '#2f2a33', top = base - h, hy = top + 10;
+    let g = '';
+    const arm = (sx, ex, ey) => `<path d="M${sx} ${top + 26}L${ex} ${ey}" stroke="${c}" stroke-width="5.5" stroke-linecap="round"/><circle cx="${ex}" cy="${ey}" r="2.8" fill="${C.skin}"/>`;
+    if (o.up === 'both' || o.up === 'l') g += arm(x - 9, x - 17, top + 2);
+    if (o.up === 'both' || o.up === 'r') g += arm(x + 9, x + 17, top + 2);
+    if (o.cape) g += `<path d="M${x - 12} ${top + 22}L${x - 20} ${base}H${x + 20}L${x + 12} ${top + 22}z" fill="${C.redD}"/>`;
+    g += `<path d="M${x - 13} ${base}L${x - 11} ${top + 24}Q${x} ${top + 17} ${x + 11} ${top + 24}L${x + 13} ${base}Z" fill="${c}"/>`;
+    if (o.apron) g += `<path d="M${x - 8} ${top + 32}h16l2 ${h - 34}h-20z" fill="${C.cream}"/>`;
+    if (!o.up) g += `<path d="M${x - 11} ${top + 26}l-3 24M${x + 11} ${top + 26}l3 24" stroke="${c}" stroke-width="5" stroke-linecap="round"/>`;
+    g += `<rect x="${x - 3}" y="${top + 16}" width="6" height="6" fill="${C.skinD}"/><circle cx="${x}" cy="${hy}" r="9" fill="${C.skin}"/>`;
+    const hs = o.hs || 'short';
+    if (hs === 'short') g += `<path d="M${x - 9.5} ${hy - 1}q0-11 9.5-11t9.5 11q-5-5-9.5-4.5t-9.5 4.5z" fill="${hr}"/>`;
+    if (hs === 'pony') g += `<path d="M${x - 9.5} ${hy}q0-12 9.5-12t9.5 12q-6-6-11-5t-8 5z" fill="${hr}"/><path d="M${x + 7} ${hy - 8}q12 2 10 18-4-8-10-10z" fill="${hr}"/>`;
+    if (hs === 'long') g += `<path d="M${x - 10} ${hy + 10}q-2-22 10-22t10 22q-2-8-4-12q-6 4-12 0q-2 4-4 12z" fill="${hr}"/>`;
+    if (hs === 'bun') g += `<path d="M${x - 9.5} ${hy - 1}q0-11 9.5-11t9.5 11q-5-5-9.5-4.5t-9.5 4.5z" fill="${hr}"/><circle cx="${x}" cy="${hy - 12}" r="4.5" fill="${hr}"/>`;
+    if (o.glasses) g += `<g fill="none" stroke="${C.ink}" stroke-width="1.2"><circle cx="${x - 3.5}" cy="${hy}" r="3"/><circle cx="${x + 3.5}" cy="${hy}" r="3"/></g>`;
+    const fx = o.face === 'r' ? 3 : o.face === 'l' ? -3 : 0;
+    g += o.laugh ? `<path d="M${x - 5 + fx} ${hy}q1.5-2 3 0M${x + 2 + fx} ${hy}q1.5-2 3 0" fill="none" stroke="${C.ink}" stroke-width="1.2"/><path d="M${x - 3 + fx} ${hy + 4}h6q-3 4-6 0z" fill="#8a3c3c"/>`
+      : `<circle cx="${x - 3.2 + fx}" cy="${hy}" r="1.1" fill="${C.ink}"/><circle cx="${x + 3.2 + fx}" cy="${hy}" r="1.1" fill="${C.ink}"/><path d="M${x - 2 + fx} ${hy + 4.5}q2 1.6 4 0" fill="none" stroke="#8a3c3c" stroke-width="1.1"/>`;
+    if (o.star) g += starBtn(x - 7, top + 26, 3.4);
+    return o.bow ? `<g transform="rotate(${o.bow} ${x} ${base})">${g}</g>` : g;
+  };
+  const FOX = { c: C.red, hair: '#c0623a', hs: 'pony', cape: true, star: true };
+  const GUARD = { c: C.grey, hair: '#3a332e' }, SCHOLAR = { c: C.olive, hair: '#2f2a33', glasses: true }, SELLER = { c: C.pink, hair: '#6a4330', hs: 'long' };
+  const spear = (x1, y1, x2, y2) => `<path d="M${x1} ${y1}L${x2} ${y2}" stroke="${C.woodL}" stroke-width="3"/><path d="M${x2} ${y2}l-3 8h6z" fill="#c9ccd4" transform="rotate(${Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI + 90} ${x2} ${y2})"/>`;
+  const book = (x, y) => `<rect x="${x - 7}" y="${y - 5}" width="14" height="10" fill="${C.redD}"/><path d="M${x} ${y - 5}v10" stroke="${C.cream}" stroke-width="1"/>`;
+  const basket = (x, y) => `<path d="M${x - 9} ${y}h18l-3 9h-12z" fill="${C.ochre}"/><circle cx="${x - 4}" cy="${y - 2}" r="3" fill="${C.red}"/><circle cx="${x + 3}" cy="${y - 3}" r="3" fill="${C.cream}"/><circle cx="${x + 1}" cy="${y + 1}" r="2.5" fill="${C.tealL}"/>`;
+  const curtains = `<rect width="156" height="150" fill="#1d2433"/><rect width="24" height="150" fill="${C.redD}"/><rect x="132" width="24" height="150" fill="${C.redD}"/><path d="M8 0v150M16 0v150M140 0v150M148 0v150" stroke="#5e2321" stroke-width="2.5"/><path d="M0 0h156v14q-78 12-156 0z" fill="${C.red}"/>`;
+  const floorBand = `<rect y="128" width="156" height="22" fill="#5b4132"/>`;
+  const PHOTOS = [
+    // 1 首演：舞台、幕布、追光，全员谢幕前的站位
+    `${curtains}<path d="M78 14l-40 116h80z" fill="${C.gold}" opacity=".18"/>${floorBand}
+     ${tiny(34, 134, GUARD)}${spear(26, 132, 22, 60)}${tiny(56, 136, SCHOLAR)}${book(66, 104)}${tiny(78, 138, { ...FOX, up: 'both', laugh: true, h: 80 })}${tiny(100, 136, SELLER)}${basket(110, 108)}${tiny(122, 134, GUARD)}${spear(130, 132, 134, 60)}`,
+    // 2 第二场：星空布景，主角举着纸板大星星
+    `<rect width="156" height="150" fill="#202a44"/><g fill="${C.gold}" opacity=".8"><circle cx="20" cy="20" r="1.5"/><circle cx="50" cy="12" r="1"/><circle cx="130" cy="24" r="1.5"/><circle cx="110" cy="10" r="1"/><circle cx="140" cy="60" r="1"/></g>${floorBand}
+     ${tiny(30, 136, SELLER)}${basket(40, 110)}${tiny(54, 138, GUARD)}${tiny(102, 138, SCHOLAR)}${book(112, 106)}${tiny(126, 136, GUARD)}
+     ${tiny(78, 140, { ...FOX, up: 'both', h: 78, laugh: true })}${star(78, 46, 18, C.gold)}<path d="M66 50l-6 12M90 50l6 12" stroke="${C.woodL}" stroke-width="2"/>`,
+    // 3 返场：鞠躬，主角抱着花，台口有扔上来的花
+    `${curtains}${floorBand}${tiny(30, 136, { ...GUARD, bow: -18 })}${tiny(52, 136, { ...SCHOLAR, bow: -18 })}${tiny(104, 136, { ...SELLER, bow: 18 })}${tiny(126, 136, { ...GUARD, bow: 18 })}
+     ${tiny(78, 138, { ...FOX, laugh: true, h: 78 })}<g><circle cx="70" cy="92" r="5" fill="${C.pink}"/><circle cx="78" cy="88" r="5" fill="${C.cream}"/><circle cx="86" cy="93" r="5" fill="${C.red}"/><path d="M74 98l4 14 4-14z" fill="${C.olive}"/></g>
+     <circle cx="44" cy="144" r="3.5" fill="${C.red}"/><circle cx="96" cy="146" r="3.5" fill="${C.pink}"/><circle cx="118" cy="143" r="3" fill="${C.cream}"/>`,
+    // 4 化妆间：镜子一圈灯泡，许知夏戴耳麦给主角上妆
+    `<rect width="156" height="150" fill="#3d4a5e"/><rect x="18" y="16" width="120" height="70" fill="#6f8298"/><g fill="${C.gold}">${[0, 1, 2, 3, 4, 5].map((i) => `<circle cx="${24 + i * 22}" cy="14" r="3"/>`).join('')}</g><rect y="104" width="156" height="46" fill="${C.woodL}"/>
+     ${tiny(46, 140, { ...FOX, h: 64 })}${tiny(74, 140, { c: '#2b2a30', hair: '#2b2a30', hs: 'bun', up: 'l', face: 'l' })}<path d="M70 58q4-8 10-2" fill="none" stroke="${C.ink}" stroke-width="1.5"/><path d="M57 60l-6 4" stroke="${C.cream}" stroke-width="2.4" stroke-linecap="round"/>
+     ${tiny(108, 140, { ...SCHOLAR, laugh: true })}${tiny(134, 140, { ...GUARD, face: 'l' })}<path d="M124 104q8-12 16 0z" fill="#9aa8ba"/>`,
+    // 5 侍卫：两个侍卫把长矛交叉成 X，主角从下面钻过去
+    `<rect width="156" height="150" fill="#2a3346"/>${floorBand}${tiny(36, 136, { ...SCHOLAR, laugh: true })}${book(46, 104)}${tiny(120, 136, { ...SELLER, laugh: true })}${basket(130, 108)}
+     ${tiny(56, 140, { ...GUARD, up: 'r', h: 80 })}${tiny(100, 140, { ...GUARD, up: 'l', h: 80, hair: '#5a3a2a' })}${spear(48, 124, 110, 40)}${spear(108, 124, 46, 40)}
+     ${tiny(78, 142, { ...FOX, h: 58, laugh: true })}`,
+    // 6 庆功：长桌、蛋糕和蜡烛，所有人都在笑
+    `<rect width="156" height="150" fill="#3a3346"/><path d="M0 30h156" stroke="${C.gold}" stroke-width="2" stroke-dasharray="4 6" opacity=".6"/>
+     ${tiny(22, 112, { ...SCHOLAR, laugh: true, up: 'l' })}${tiny(46, 108, { ...SELLER, laugh: true })}${tiny(78, 110, { ...FOX, laugh: true, up: 'both' })}${tiny(110, 108, { ...GUARD, laugh: true })}${tiny(136, 112, { c: '#2b2a30', hair: '#2b2a30', hs: 'bun', laugh: true, up: 'r' })}
+     <rect x="0" y="104" width="156" height="46" fill="${C.cream}"/><rect x="0" y="104" width="156" height="6" fill="${C.paper}"/>
+     <rect x="62" y="88" width="32" height="18" rx="3" fill="${C.pink}"/><rect x="62" y="88" width="32" height="5" fill="#f3ead6"/><g stroke="${C.mustard}" stroke-width="2"><path d="M70 80v8M78 78v10M86 80v8"/></g><g fill="#ff9a5a"><circle cx="70" cy="78" r="2"/><circle cx="78" cy="76" r="2"/><circle cx="86" cy="78" r="2"/></g>
+     <path d="M20 118h20q0 10-10 10t-10-10zM116 118h20q0 10-10 10t-10-10z" fill="#fff"/><path d="M20 118h20M116 118h20" stroke="${C.teal}" stroke-width="2"/>`,
+    // 7 第七次：画面外伸进来一只手，捏着针，在缝主角肩上的纽扣
+    `${curtains}${floorBand}${tiny(30, 136, GUARD)}${spear(22, 134, 18, 62)}${tiny(52, 136, SCHOLAR)}${tiny(98, 136, SELLER)}
+     ${tiny(78, 138, { ...FOX, h: 80, face: 'r' })}
+     <path d="M156 82l-48 0-8 -4-2 6 8 6 50 2z" fill="${C.skin}"/><path d="M156 76h-18v18h18z" fill="#5d7480"/><path d="M98 80l-10-10" stroke="${C.cream}" stroke-width="1.6" stroke-linecap="round"/><path d="M88 70q-8-8-4 6" fill="none" stroke="${C.red}" stroke-width="1"/>`
+  ];
+  const CAPS = ['首演', '第二场', '返场', '化妆间', '侍卫', '庆功', '第七次'];
   function photosClose() {
     let s = `<rect width="1000" height="720" fill="url(#wallg)"/><rect width="1000" height="720" fill="url(#dots)"/>
+      <defs><clipPath id="ph-clip"><rect x="0" y="0" width="156" height="150"/></clipPath></defs>
       <g filter="url(#sh)"><rect x="50" y="50" width="900" height="620" rx="8" fill="${C.woodD}"/></g><rect x="70" y="70" width="860" height="580" fill="#a8845a"/><rect x="70" y="70" width="860" height="580" fill="url(#dots)"/>`;
-    const cols = [C.grey, C.olive, C.pink, C.mustard, C.tealL, C.grey];
-    const photo = (x, y, rot, n, hand) => {
-      let p = `<g transform="rotate(${rot} ${x + 90} ${y + 110})" filter="url(#shs)"><rect x="${x}" y="${y}" width="180" height="${hand ? 214 : 220}" fill="${C.cream}"/><rect x="${x + 12}" y="${y + 12}" width="156" height="150" fill="#232c3d"/>`;
-      const k = hand ? 3 : 5 + (n % 2);
-      for (let i = 0; i < k; i++) { const px = x + 30 + i * (hand ? 30 : 126 / (k - 1)), py = y + 74 + ((i + n) % 2) * 10; if (!hand && i === Math.floor(k / 2)) continue; p += `<path d="M${px - 14} ${y + 162}q0-52 14-52t14 52z" fill="${cols[(i + n) % 6]}"/><circle cx="${px}" cy="${py + 26}" r="11" fill="${C.skin}"/>`; }
-      const hx = hand ? x + 118 : x + 90;
-      p += `<path d="M${hx - 22} ${y + 162}q0-70 22-70t22 70z" fill="${C.red}"/><circle cx="${hx}" cy="${y + 80}" r="13" fill="${C.skin}"/><path d="M${hx - 13} ${y + 76}q13-20 26 0-13-6-26 0z" fill="#b8643a"/>${starBtn(hx + 16, y + 104, 7)}`;
-      if (hand) p += `<path d="M${x + 168} ${y + 128}l-22-16-10 4 2 12 26 14z" fill="${C.skin}"/><path d="M${x + 168} ${y + 122}h-12v26h12z" fill="#5d7480"/><path d="M${x + 138} ${y + 116}l-8-10" stroke="${C.cream}" stroke-width="2.5" stroke-linecap="round"/>`;
-      p += `<path d="M${x + 30} ${y + 188}h${hand ? 80 : 120}" stroke="${C.woodD}" stroke-width="3" opacity=".5"/><circle cx="${x + 90}" cy="${y + 4}" r="7" fill="${n % 2 ? C.gold : C.red}"/></g>`;
-      return p;
-    };
+    const photo = (x, y, rot, n) => `<g transform="rotate(${rot} ${x + 90} ${y + 110})" filter="url(#shs)"><rect x="${x}" y="${y}" width="180" height="214" fill="${C.cream}"/>
+      <g transform="translate(${x + 12} ${y + 12})" clip-path="url(#ph-clip)">${PHOTOS[n]}</g>
+      <text x="${x + 90}" y="${y + 194}" text-anchor="middle" class="t-hand" font-size="20" fill="${C.woodD}">${CAPS[n]}</text>
+      <circle cx="${x + 90}" cy="${y + 4}" r="7" fill="${n % 2 ? C.gold : C.red}"/></g>`;
     const tick = (f, x, y) => `<g data-if="${f}"><circle cx="${x}" cy="${y}" r="18" fill="${C.ink}"/><path d="M${x - 8} ${y}l6 7 11-14" fill="none" stroke="${C.gold}" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/></g>`;
     s += H('row1', '第一排的四张', photo(96, 92, -3, 0) + photo(302, 100, 2, 1) + photo(508, 90, -2, 2) + photo(716, 100, 3, 3) + tick('r1', 500, 330), [88, 84, 820, 250], { mx: 902, my: 96 });
     s += H('ph5', '第五张', photo(150, 388, 2, 4) + tick('ph5', 240, 630), [142, 380, 196, 240], { mx: 334, my: 392 });
     s += H('ph6', '第六张', photo(400, 396, -2, 5) + tick('ph6', 490, 636), [392, 388, 196, 240], { mx: 584, my: 400 });
-    s += H('ph7', '第七张', photo(660, 390, 3, 6, true), [652, 382, 196, 236], { mx: 844, my: 394 });
+    s += H('ph7', '第七张', photo(660, 390, 3, 6), [652, 382, 196, 236], { mx: 844, my: 394 });
     return svg(1000, 720, s + frame(1000, 720), 'close-svg');
   }
 

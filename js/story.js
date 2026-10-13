@@ -312,7 +312,7 @@
   const rackCheck = async () => {
     if (is('rackDone') || !rackDone()) return;
     flag('rackDone');
-    await talk([['n', '四件戏服，四颗纽扣，一颗不少。'], ['n', '那盒子里裂掉的这颗，只可能来自不在这里的那一件。'], ['you', '主角服。在后台。']]);
+    await talk([['n', '少了纽扣的，只可能是不在这里的那一件。'], ['you', '主角服。在后台。']]);
     G().closeCloseup();
   };
   const props = {
@@ -342,6 +342,11 @@
       async radio() { G().openCloseup('radio'); },
       async poster() { G().openCloseup('poster'); },
       async rack() {
+        if (is('matched') && !is('rackDone')) {
+          ['c1', 'c2', 'c3', 'c4'].forEach(flag); flag('tagSeen'); flag('rackSeen');
+          await talk([['n', '四件戏服，肩上都扣着同样的四角星纽扣，一颗不少。'], ['n', '最后一个衣架是空的。挂牌上写着：主角服 · 在后台。']]);
+          return rackCheck();
+        }
         if (!is('rackSeen')) { flag('rackSeen'); await talk([['n', '一排戏服，都是同一部戏的。']]); }
         G().openCloseup('rack');
       }
@@ -415,7 +420,9 @@
       async tag() {
         flag('tagSeen');
         await talk([['n', '最后一个衣架是空的。'], ['n', '挂牌上写着：主角服 · 在后台。']]);
-        if (!rackDone()) await talk([['n', '别的戏服上，纽扣都还在吗。']]);
+        if (!is('matched')) { flag('matched'); await talk([['n', '旁边几件戏服肩上，都扣着黑色的四角星纽扣。'], ['you', '和盒子里那颗一样。']]); }
+        ['c1', 'c2', 'c3', 'c4'].forEach(flag);
+        await talk([['n', '其他四件的纽扣都在。']]);
         return rackCheck();
       }
     }
@@ -540,9 +547,9 @@
   const photosDone = () => is('r1') && is('ph5') && is('ph6');
   const photos = {
     hs: {
-      async row1() { flag('r1'); await talk([['n', '首演，二轮，返场，庆功。每一张都站满了人。'], ['fox', '第一排这四张没有他。我不用看都知道。']]); },
-      async ph5() { flag('ph5'); await talk([['n', '第五张。后排有人举着长矛。'], ['fox', '那是侍卫。矛头是他钉的，人不是他。']]); },
-      async ph6() { flag('ph6'); await talk([['n', '第六张，所有人都在笑。'], ['fox', '庆功那晚。他在厨房。']]); },
+      async row1() { flag('r1'); await talk([['n', '首演，第二场，返场，化妆间。每一张都站满了人。'], ['n', '第二场那张，她举着一颗纸板做的大星星。'], ['fox', '那颗星星是他剪的。这四张都没有他，我不用看都知道。']]); },
+      async ph5() { flag('ph5'); await talk([['n', '第五张。两个侍卫把长矛交叉成一个叉，她从底下钻过去，笑得最大声。'], ['fox', '矛头是他钉的。拍的时候，他在后面扶着那两根杆子，怕掉下来砸到我。']]); },
+      async ph6() { flag('ph6'); await talk([['n', '第六张，庆功。桌上有蛋糕，所有人都在笑。'], ['fox', '那晚的面是他煮的。我们吃的时候，他在厨房洗锅。']]); },
       async ph7() {
         const g = G();
         if (is('handSeen')) return talk([['n', '画面外伸进来的一只手，捏着针。']]);
