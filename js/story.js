@@ -573,10 +573,11 @@
 
   /* ---------- 第四间：后厨 ---------- */
   const bowlNames = ['狐狸', '老周', '阿澈', '陈望', '知夏'];
-  const flip = (i) => async () => {
-    flag('b' + i);
-    await talk([['n', `我把碗翻过来。碗底用记号笔写着：${bowlNames[i - 1]}。`]]);
-    if (is('bowlsDone') || ![1, 2, 3, 4, 5].every((n) => is('b' + n))) return;
+  // 点任意一只，就把五只都翻过来
+  const flip = () => async () => {
+    if (is('bowlsDone')) return talk([['n', '五只碗，五个名字。没有他的。']]);
+    [1, 2, 3, 4, 5].forEach((n) => flag('b' + n));
+    await talk([['n', '我把碗一只只翻过来。碗底都用记号笔写着名字。'], ['n', `${bowlNames.join('，')}。`]]);
     flag('bowlsDone');
     await talk([['n', '五只碗，五个名字。我又数了一遍。'], ['n', '没有他自己的。'], ['zhou', '他都是等大家吃完，站在灶边就着锅吃。']]);
     await G().note('写了名字的碗', '每只碗都有名字，除了洗碗的人。');
@@ -701,7 +702,7 @@
   };
   const cupboard = {
     hs: {
-      b1: flip(1), b2: flip(2), b3: flip(3), b4: flip(4), b5: flip(5),
+      b1: flip(), b2: flip(), b3: flip(), b4: flip(), b5: flip(),
       async sealed() {
         flag('sealedSeen');
         await talk([['n', '最上层有一只没拆封的碗。'], ['zhou', '我后来给他买的。碗底也写了名字，是我的字。'], ['zhou', '他一次没用过。说留着下次。']]);
