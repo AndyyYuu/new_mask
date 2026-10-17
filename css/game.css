@@ -67,7 +67,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 #portrait { position: absolute; z-index: 30; bottom: 0; height: 96%; pointer-events: none; transition: opacity .2s, transform .2s; }
 #portrait.left { left: 3%; } #portrait.right { right: 3%; }
 #portrait.dim { opacity: .5; transform: translateY(8px); }
-#portrait svg { height: 100%; width: auto; display: block; }
+#portrait img, #portrait svg { height: 100%; width: auto; display: block; filter: drop-shadow(-10px 12px 0 rgba(20, 26, 38, .45)); }
 
 /* ---- 下方：对白 + 铁盒 ---- */
 #panel { background: var(--panel); border-top: 2px solid var(--brass); padding: 10px 16px calc(10px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 8px; position: relative; z-index: 70; }

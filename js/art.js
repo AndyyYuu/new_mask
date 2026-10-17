@@ -158,6 +158,8 @@
     ${symbols}
   </defs></svg>`;
 
+  /* 新立绘（683x1024，脚底贴着图片下沿） */
+  const pic = (k, x, y, h, extra = '') => `<image href="${window.CHAR_BASE || 'assets/chars/'}${k}.webp" x="${x}" y="${y}" width="${(h * 2 / 3).toFixed(1)}" height="${h}" preserveAspectRatio="xMidYMax meet" ${extra}/>`;
   /* ---------- 通用零件 ---------- */
   const frame = (w, h) => {
     const m = 30, r = 26, m2 = 40, r2 = 20;
@@ -595,7 +597,7 @@
       <rect x="186" y="506" width="60" height="22" rx="2" fill="none" stroke="${C.gold}" stroke-width="2"/><rect x="262" y="506" width="60" height="22" rx="2" fill="none" stroke="${C.gold}" stroke-width="2"/></g>`;
     s += H('sewing', '针线盒', sewing, [162, 424, 198, 118], { mx: 356, my: 432 });
     // 学姐
-    const foxArt = (window.Figures ? window.Figures.fox('x="650" y="170" width="262" height="656"') : fox('x="610" y="356" width="330" height="429"')) + `<g filter="url(#sh)"><rect x="590" y="680" width="230" height="120" fill="#a8845a"/><rect x="590" y="680" width="230" height="20" fill="#b99468"/><rect x="800" y="716" width="170" height="84" fill="#97764f"/>
+    const foxArt = pic('fox_box', 560, 150, 680) + `<g filter="url(#sh)"><rect x="590" y="680" width="230" height="120" fill="#a8845a"/><rect x="590" y="680" width="230" height="20" fill="#b99468"/><rect x="800" y="716" width="170" height="84" fill="#97764f"/>
       <rect x="640" y="722" width="110" height="46" rx="3" fill="${C.cream}"/><text x="695" y="756" text-anchor="middle" class="t-hand" font-size="30" fill="${C.ink}">胡黎</text></g>`;
     s += H('fox', '收拾东西的学姐', foxArt, [690, 190, 190, 500], { key: true, mx: 870, my: 204 });
     // 主角服
@@ -729,7 +731,7 @@
     const recipe = `<g filter="url(#shs)" transform="rotate(2 485 322)"><rect x="410" y="232" width="150" height="180" fill="${C.cream}"/><circle cx="485" cy="244" r="7" fill="${C.red}"/><g stroke="${C.ink}" stroke-width="3" opacity=".6" stroke-linecap="round"><path d="M426 276h110M426 298h96M426 320h110M426 342h80"/></g><path d="M426 388h64" stroke="${C.redD}" stroke-width="2" stroke-linecap="round"/><ellipse cx="532" cy="384" rx="18" ry="13" fill="${C.ochre}" opacity=".35"/></g>`;
     s += H('recipe', '墙上的菜谱', recipe, [402, 224, 168, 198], { mx: 566, my: 232 });
     // 老周
-    s += H('zhou', '系围裙的人', window.Figures ? window.Figures.zhou('x="836" y="150" width="248" height="620"') : zhou('x="810" y="262" width="290" height="377"'), [870, 166, 180, 394], { key: true, mx: 1044, my: 180 });
+    s += H('zhou', '系围裙的人', pic('zhou_wipe', 770, 140, 640), [870, 166, 180, 394], { key: true, mx: 1044, my: 180 });
     // 台面、灶、锅
     s += `<g filter="url(#sh)"><rect x="400" y="560" width="740" height="28" fill="${C.woodL}"/><rect x="420" y="588" width="700" height="212" fill="${C.wood}"/></g>
       <g fill="none" stroke="${C.woodD}" stroke-width="3" opacity=".5"><rect x="440" y="610" width="210" height="170" rx="4"/><rect x="664" y="610" width="210" height="170" rx="4"/><rect x="888" y="610" width="212" height="170" rx="4"/></g>`;
@@ -783,7 +785,8 @@
 
 
   /* ---------- 场景六：三天后，礼堂门口 ---------- */
-  const fig = (n, x, y, h) => (window.Figures ? window.Figures[n](`x="${x}" y="${y}" width="${h * 0.4}" height="${h}"`) : '');
+  const FIGK = { lin: 'lin_shy', fox: 'fox_point', zhou: 'zhou_smile', mate: 'mate_wave', lead: 'lead_tie' };
+  const fig = (n, x, y, h) => pic(FIGK[n], x - h * 0.13, y, h);
   function epilogue() {
     let s = wall(1600, 900, 800);
     s += `<g filter="url(#sh)"><rect x="470" y="110" width="660" height="690" rx="8" fill="${C.woodD}"/></g>

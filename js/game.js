@@ -96,18 +96,28 @@
   const SPEAKERS = { n: { name: '', cls: 'narr' }, you: { name: '你', cls: 'you' }, lead: { name: '负责人', cls: 'npc', side: 'left' }, mate: { name: '室友', cls: 'npc', side: 'right' }, tape: { name: '磁带 R-17', cls: 'tape' },
     fox: { name: '狐狸学姐', cls: 'npc', side: 'right' }, zhou: { name: '老周', cls: 'npc', side: 'left' }, lin: { name: '小林', cls: 'npc', side: 'right' } };
   let portraitWho = null;
-  function setPortrait(who) {
-    const sp = SPEAKERS[who];
+  /* 立绘：每个角色有几张姿势图（assets/chars/角色_姿势.webp）。
+   * 台词第三项写姿势，比如 ['lin', '不了。', 'no']；写成 'fox:sad' 可以在旁白时亮出别人的立绘。
+   * 不写就沿用这个角色上一次的姿势。 */
+  const POSE_DEFAULT = { lin: 'box', fox: 'box', zhou: 'smile', mate: 'curious', lead: 'bag' };
+  let poses = {}, portraitKey = null;
+  const poseSrc = (who, pose) => `${window.CHAR_BASE || 'assets/chars/'}${who}_${pose}.webp`;
+  function setPortrait(who, pose) {
+    let show = who;
+    if (pose && pose.includes(':')) { [show, pose] = pose.split(':'); }
+    const sp = SPEAKERS[show];
     if (sp && sp.side) {
-      if (portraitWho !== who) { portraitEl.innerHTML = Art.portraits[who](); portraitWho = who; }
+      if (pose) poses[show] = pose;
+      const p = poses[show] || POSE_DEFAULT[show], key = show + '_' + p;
+      if (portraitKey !== key) { portraitEl.innerHTML = `<img src="${poseSrc(show, p)}" alt="">`; portraitKey = key; portraitWho = show; }
       portraitEl.className = sp.side; portraitEl.hidden = false;
     } else if (portraitWho) portraitEl.classList.add('dim');
   }
-  function clearPortrait() { portraitEl.hidden = true; portraitWho = null; portraitEl.innerHTML = ''; }
-  function say(who, text) {
+  function clearPortrait() { portraitEl.hidden = true; portraitWho = null; portraitKey = null; portraitEl.innerHTML = ''; }
+  function say(who, text, pose) {
     const sp = SPEAKERS[who] || SPEAKERS.n;
     S.log.push([sp.name, text]); if (S.log.length > 160) S.log.shift();
-    setPortrait(who);
+    setPortrait(who, pose);
     dlg.className = sp.cls; whoEl.textContent = sp.name; whoEl.hidden = !sp.name;
     choicesEl.innerHTML = ''; nextEl.hidden = false; nextEl.classList.remove('ready');
     return new Promise((res) => {
@@ -118,7 +128,7 @@
       else { textEl.textContent = ''; timer = setInterval(() => { i += 1; textEl.textContent = text.slice(0, i); if (i >= text.length) finish(); }, 26); }
     });
   }
-  async function talk(lines) { for (const [who, text] of lines) await say(who, text); }
+  async function talk(lines) { for (const [who, text, pose] of lines) await say(who, text, pose); }
   function choose(prompt, opts) {
     advance = null; dlg.className = 'narr'; whoEl.hidden = true; nextEl.hidden = true; textEl.textContent = prompt || '';
     return new Promise((res) => {
@@ -373,7 +383,7 @@
   }
   async function go(id, title, sub) {
     setBusy(true); closeCloseup(); book.hide(); closeSheet(); clearPortrait();
-    S.scene = id; store.save();
+    S.scene = id; store.save(); poses = {};
     advance = null; dlg.className = 'idle'; textEl.textContent = ''; choicesEl.innerHTML = ''; whoEl.hidden = true;
     if (title) { renderScene(); await transition(title, sub); } else renderScene();
     const sc = scene(), first = !is('in.' + id);
@@ -454,6 +464,7 @@
     get S() { return S; }, say, talk, choose, present, circle, give, drop, has, is, flag, go, wait, sfx, tape,
     openCloseup, closeCloseup, book, ending, sheet, note, view, sceneEl, closeEl, el, esc
   };
+  ['lin_box','lin_surprise','lin_read','lin_no','lin_bowl','lin_shy','fox_box','fox_gasp','fox_sad','fox_call','fox_phone','fox_point','zhou_wipe','zhou_glasses','zhou_bowl','zhou_smile','mate_shrug','mate_curious','mate_wave','lead_bag','lead_tie','lead_me','lead_smile','lead_shout'].forEach((k) => { const i = new Image(); i.src = `${window.CHAR_BASE || 'assets/chars/'}${k}.webp`; });
   title();
   if (window.claude && window.claude.hot && window.claude.hot.snapshot) window.claude.hot.snapshot(() => { store.save(); return {}; });
 })();
